@@ -113,9 +113,7 @@ export class QuantelGateway extends EventEmitter {
 	 * @param callbackOnStatusChange Callback function called when
 	 * the connection status through to the ISA manager changes.
 	 */
-	public monitorServerStatus(
-		callbackOnStatusChange: (connected: boolean, errorMessage: string | null) => void
-	): void {
+	public monitorServerStatus(callbackOnStatusChange: (connected: boolean, errorMessage: string | null) => void): void {
 		const getServerStatus = async (): Promise<string | null> => {
 			try {
 				this._connected = false
@@ -141,9 +139,7 @@ export class QuantelGateway extends EventEmitter {
 						!portExists && // our port is NOT set up on server
 						realPortNames.length === (server.numChannels || 0) // There is no more room on server
 					) {
-						serverErrors.push(
-							`Not able to assign port "${monitorPortId}", due to all ports being already used`
-						)
+						serverErrors.push(`Not able to assign port "${monitorPortId}", due to all ports being already used`)
 					} else {
 						for (const monitorChannel of monitorPort.channels) {
 							const channelPort = (server.chanPorts || [])[monitorChannel]
@@ -165,7 +161,7 @@ export class QuantelGateway extends EventEmitter {
 
 				return null // all good
 			} catch (e) {
-				return `Error when monitoring status: ${(e && e.message) || e.toString()}`
+				return `Error when monitoring status: ${(e as any)?.message || (e as any).toString()}`
 			}
 		}
 		const checkServerStatus = (): void => {
@@ -279,7 +275,7 @@ export class QuantelGateway extends EventEmitter {
 		try {
 			return await this.sendServer('GET', `port/${portId}`)
 		} catch (e) {
-			if (this._isNotFoundAThing(e)) return null
+			if (this._isNotFoundAThing(e as any)) return null
 			throw e
 		}
 	}
@@ -323,7 +319,7 @@ export class QuantelGateway extends EventEmitter {
 		try {
 			return await this.sendZone<Q.ClipData>('GET', `clip/${clipId}`)
 		} catch (e) {
-			if (this._isNotFoundAThing(e)) return null
+			if (this._isNotFoundAThing(e as any)) return null
 			throw e
 		}
 	}
@@ -353,16 +349,8 @@ export class QuantelGateway extends EventEmitter {
 	 * @returns Collection of fragments that are contained within or overlap the given
 	 * time boundary.
 	 */
-	public async getClipFragments(
-		clipId: number,
-		inPoint: number,
-		outPoint: number
-	): Promise<Q.ServerFragments> // Query fragments for a specific in-out range:
-	public async getClipFragments(
-		clipId: number,
-		inPoint?: number,
-		outPoint?: number
-	): Promise<Q.ServerFragments> {
+	public async getClipFragments(clipId: number, inPoint: number, outPoint: number): Promise<Q.ServerFragments> // Query fragments for a specific in-out range:
+	public async getClipFragments(clipId: number, inPoint?: number, outPoint?: number): Promise<Q.ServerFragments> {
 		if (inPoint !== undefined && outPoint !== undefined) {
 			return this.sendZone('GET', `clip/${clipId}/fragments/${inPoint}-${outPoint}`)
 		} else {
@@ -386,7 +374,7 @@ export class QuantelGateway extends EventEmitter {
 			'POST',
 			`port/${portId}/fragments`,
 			{
-				offset: offset
+				offset: offset,
 			},
 			fragments
 		)
@@ -394,14 +382,10 @@ export class QuantelGateway extends EventEmitter {
 	}
 
 	/** Query the port for which fragments are loaded. */
-	public async getFragmentsOnPort(
-		portId: string,
-		rangeStart?: number,
-		rangeEnd?: number
-	): Promise<Q.ServerFragments> {
+	public async getFragmentsOnPort(portId: string, rangeStart?: number, rangeEnd?: number): Promise<Q.ServerFragments> {
 		return this.sendServer<Q.ServerFragments>('GET', `port/${portId}/fragments`, {
 			start: rangeStart,
-			finish: rangeEnd
+			finish: rangeEnd,
 		})
 		// /:zoneID/server/:serverID/port/:portID/fragments(?start=:start&finish=:finish)
 	}
@@ -413,8 +397,7 @@ export class QuantelGateway extends EventEmitter {
 	 */
 	public async portPlay(portId: string): Promise<Q.TriggerResult> {
 		const response = await this.sendServer<Q.TriggerResult>('POST', `port/${portId}/trigger/START`)
-		if (!response.success)
-			throw Error(`Quantel trigger start: Server returned success=${response.success}`)
+		if (!response.success) throw Error(`Quantel trigger start: Server returned success=${response.success}`)
 		return response
 	}
 
@@ -427,10 +410,9 @@ export class QuantelGateway extends EventEmitter {
 	 */
 	public async portStop(portId: string, stopAtFrame?: number): Promise<Q.TriggerResult> {
 		const response = await this.sendServer<Q.TriggerResult>('POST', `port/${portId}/trigger/STOP`, {
-			offset: stopAtFrame
+			offset: stopAtFrame,
 		})
-		if (!response.success)
-			throw Error(`Quantel trigger stop: Server returned success=${response.success}`)
+		if (!response.success) throw Error(`Quantel trigger stop: Server returned success=${response.success}`)
 		return response
 	}
 
@@ -442,10 +424,9 @@ export class QuantelGateway extends EventEmitter {
 	 */
 	public async portHardJump(portId: string, jumpToFrame?: number): Promise<Q.JumpResult> {
 		const response = await this.sendServer<Q.JumpResult>('POST', `port/${portId}/trigger/JUMP`, {
-			offset: jumpToFrame
+			offset: jumpToFrame,
 		})
-		if (!response.success)
-			throw Error(`Quantel hard jump: Server returned success=${response.success}`)
+		if (!response.success) throw Error(`Quantel hard jump: Server returned success=${response.success}`)
 		return response
 	}
 
@@ -458,10 +439,9 @@ export class QuantelGateway extends EventEmitter {
 	 */
 	public async portPrepareJump(portId: string, jumpToFrame?: number): Promise<Q.JumpResult> {
 		const response = await this.sendServer<Q.JumpResult>('PUT', `port/${portId}/jump`, {
-			offset: jumpToFrame
+			offset: jumpToFrame,
 		})
-		if (!response.success)
-			throw Error(`Quantel prepare jump: Server returned success=${response.success}`)
+		if (!response.success) throw Error(`Quantel prepare jump: Server returned success=${response.success}`)
 		return response
 	}
 
@@ -472,8 +452,7 @@ export class QuantelGateway extends EventEmitter {
 	 */
 	public async portTriggerJump(portId: string): Promise<Q.TriggerResult> {
 		const response = await this.sendServer<Q.TriggerResult>('POST', `port/${portId}/trigger/JUMP`)
-		if (!response.success)
-			throw Error(`Quantel trigger jump: Server returned success=${response.success}`)
+		if (!response.success) throw Error(`Quantel trigger jump: Server returned success=${response.success}`)
 		return response
 	}
 
@@ -490,14 +469,10 @@ export class QuantelGateway extends EventEmitter {
 	 * @returns Details of how much was wiped.
 	 * @throws If the fragments were not wiped.
 	 */
-	public async portClearFragments(
-		portId: string,
-		rangeStart?: number,
-		rangeEnd?: number
-	): Promise<Q.WipeResult> {
+	public async portClearFragments(portId: string, rangeStart?: number, rangeEnd?: number): Promise<Q.WipeResult> {
 		const response = await this.sendServer<Q.WipeResult>('DELETE', `port/${portId}/fragments`, {
 			start: rangeStart,
-			finish: rangeEnd
+			finish: rangeEnd,
 		})
 		if (!response.wiped) throw Error(`Quantel clear port: Server returned wiped=${response.wiped}`)
 		return response
@@ -546,7 +521,7 @@ export class QuantelGateway extends EventEmitter {
 				clipID,
 				poolID,
 				priority,
-				history
+				history,
 			})
 		)
 		return response
@@ -577,23 +552,18 @@ export class QuantelGateway extends EventEmitter {
 		method: Methods,
 		resource: string,
 		queryParameters?: QueryParameters,
-		bodyData?: object
+		bodyData?: any
 	): Promise<T> {
 		if (!this._serverId) throw new Error(`QuantelClient.serverId not set`)
 
-		return this.sendZone<T>(
-			method,
-			`server/${this._serverId}/${resource}`,
-			queryParameters,
-			bodyData
-		)
+		return this.sendZone<T>(method, `server/${this._serverId}/${resource}`, queryParameters, bodyData)
 	}
 
 	private async sendZone<T>(
 		method: Methods,
 		resource: string,
 		queryParameters?: QueryParameters,
-		bodyData?: object
+		bodyData?: any
 	): Promise<T> {
 		return this.sendBase<T>(method, `${this._zoneId}/${resource}`, queryParameters, bodyData)
 	}
@@ -602,21 +572,19 @@ export class QuantelGateway extends EventEmitter {
 		method: Methods,
 		resource: string,
 		queryParameters?: QueryParameters,
-		bodyData?: object
+		bodyData?: any
 	): Promise<T> {
 		if (!this._initialized) {
 			throw new Error('Quantel not initialized yet')
 		}
-		return this._ensureGoodResponse<T>(
-			this.sendRaw<T>(method, `${resource}`, queryParameters, bodyData)
-		)
+		return this._ensureGoodResponse<T>(this.sendRaw<T>(method, `${resource}`, queryParameters, bodyData))
 	}
 
 	private async sendRaw<T>(
 		method: Methods,
 		resource: string,
 		queryParameters?: QueryParameters,
-		bodyData?: object
+		bodyData?: any
 	): Promise<T | QuantelErrorResponse> {
 		const responseBody = await this.sendRawInner<T>(method, resource, queryParameters, bodyData)
 
@@ -637,7 +605,7 @@ export class QuantelGateway extends EventEmitter {
 		method: Methods,
 		resource: string,
 		queryParameters?: QueryParameters,
-		bodyData?: object
+		bodyData?: any
 	): Promise<T | QuantelErrorResponse> {
 		const url = this.urlQuery(this._gatewayUrl + '/' + resource, queryParameters)
 		try {
@@ -647,20 +615,19 @@ export class QuantelGateway extends EventEmitter {
 				json: bodyData,
 				timeout: CALL_TIMEOUT,
 				responseType: 'json',
-				resolveBodyOnly: false
+				resolveBodyOnly: false,
 			})
 			if (response.statusCode === 200) {
 				return response.body
 			} else {
-				return Promise.reject(
-					new Error(`Bad response from Quantel-Gateway: ${response.statusCode} ${response.body}`)
-				)
+				return Promise.reject(new Error(`Bad response from Quantel-Gateway: ${response.statusCode} ${response.body}`))
 			}
 		} catch (e) {
-			if (e.response && e.response.body) {
-				return e.response.body
+			const error = e as any
+			if (error.response && error.response.body) {
+				return error.response.body
 			} else {
-				throw e
+				throw error
 			}
 		}
 	}
@@ -705,9 +672,7 @@ export class QuantelGateway extends EventEmitter {
 		return response
 	}
 
-	private _isAnErrorResponse<T>(
-		response: T | QuantelErrorResponse
-	): response is QuantelErrorResponse {
+	private _isAnErrorResponse<T>(response: T | QuantelErrorResponse): response is QuantelErrorResponse {
 		const test: QuantelErrorResponse = response as QuantelErrorResponse
 		return !!(
 			test &&
