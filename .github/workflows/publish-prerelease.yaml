@@ -1,4 +1,4 @@
-name: Publish prerelease
+name: Publish Nightly to NPM
 
 on:
   # Allows you to run this workflow manually from the Actions tab
@@ -33,7 +33,7 @@ jobs:
           CI: true
 
   prerelease:
-    name: Publish to NPM
+    name: Publish nightly to NPM
     runs-on: ubuntu-latest
     timeout-minutes: 15
 
