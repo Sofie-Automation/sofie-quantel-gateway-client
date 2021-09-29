@@ -2,51 +2,51 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
-### [2.0.2](https://github.com/nrkno/tv-automation-quantel-gateway-client/compare/v2.0.1...v2.0.2) (2021-05-12)
-
+### [2.0.3-0](https://github.com/nrkno/tv-automation-quantel-gateway-client/compare/v2.0.2...v2.0.3-0) (2021-09-29)
 
 ### Bug Fixes
 
-* dont require serverId ([a6ca5a2](https://github.com/nrkno/tv-automation-quantel-gateway-client/commit/a6ca5a277b9a8db2d4d76eeb196052a3143f2674))
-* make serverId be settable during the lifetime of the QuantelGateway class ([a4b66b5](https://github.com/nrkno/tv-automation-quantel-gateway-client/commit/a4b66b551ca51e8c63d8bf2ebe180f8bee79792c))
-* refactor to remove the underscore dependency ([adaa6ab](https://github.com/nrkno/tv-automation-quantel-gateway-client/commit/adaa6ab0f66f9a2132c981f04860ef3fc91f7acc))
+- better error [release] ([d05eac3](https://github.com/nrkno/tv-automation-quantel-gateway-client/commit/d05eac342a0c1cbaac8410be3dc8596ae670c892))
+
+### [2.0.2](https://github.com/nrkno/tv-automation-quantel-gateway-client/compare/v2.0.1...v2.0.2) (2021-05-12)
+
+### Bug Fixes
+
+- dont require serverId ([a6ca5a2](https://github.com/nrkno/tv-automation-quantel-gateway-client/commit/a6ca5a277b9a8db2d4d76eeb196052a3143f2674))
+- make serverId be settable during the lifetime of the QuantelGateway class ([a4b66b5](https://github.com/nrkno/tv-automation-quantel-gateway-client/commit/a4b66b551ca51e8c63d8bf2ebe180f8bee79792c))
+- refactor to remove the underscore dependency ([adaa6ab](https://github.com/nrkno/tv-automation-quantel-gateway-client/commit/adaa6ab0f66f9a2132c981f04860ef3fc91f7acc))
 
 ### [2.0.1](https://github.com/nrkno/tv-automation-quantel-gateway-client/compare/v2.0.0...v2.0.1) (2021-03-19)
 
-
 ### Bug Fixes
 
-* type error [release] ([855e834](https://github.com/nrkno/tv-automation-quantel-gateway-client/commit/855e83442e8a2c138d8e7a6b06b32d6e9e6d2fae))
+- type error [release] ([855e834](https://github.com/nrkno/tv-automation-quantel-gateway-client/commit/855e83442e8a2c138d8e7a6b06b32d6e9e6d2fae))
 
 ## [2.0.0](https://github.com/nrkno/tv-automation-quantel-gateway-client/compare/v1.0.12...v2.0.0) (2021-03-19)
 
-
 ### ⚠ BREAKING CHANGES
 
-* change how ISA url:s are handled. All ISA urls (both master & slaves) are now handled in a single array
+- change how ISA url:s are handled. All ISA urls (both master & slaves) are now handled in a single array
 
 ### Features
 
-* change how ISA url:s are handled. All ISA urls (both master & slaves) are now handled in a single array ([fce28cc](https://github.com/nrkno/tv-automation-quantel-gateway-client/commit/fce28cc4bdf4d668372037dd400b5284ef2eef33))
-
+- change how ISA url:s are handled. All ISA urls (both master & slaves) are now handled in a single array ([fce28cc](https://github.com/nrkno/tv-automation-quantel-gateway-client/commit/fce28cc4bdf4d668372037dd400b5284ef2eef33))
 
 ### Bug Fixes
 
-* store ISAUrlMaster and ISAUrlBackup in their unaltered form, and expose them via getters. ([6ebb058](https://github.com/nrkno/tv-automation-quantel-gateway-client/commit/6ebb05861debd526a039c5d0833b5df1f1db4fee))
+- store ISAUrlMaster and ISAUrlBackup in their unaltered form, and expose them via getters. ([6ebb058](https://github.com/nrkno/tv-automation-quantel-gateway-client/commit/6ebb05861debd526a039c5d0833b5df1f1db4fee))
 
 ### [1.0.12](https://github.com/nrkno/tv-automation-quantel-gateway-client/compare/v1.0.11...v1.0.12) (2020-08-26)
 
-
 ### Bug Fixes
 
-* handle received http error responses [release] ([911d5cb](https://github.com/nrkno/tv-automation-quantel-gateway-client/commit/911d5cbb09234f17f14240dd415a6b556687f96c))
+- handle received http error responses [release] ([911d5cb](https://github.com/nrkno/tv-automation-quantel-gateway-client/commit/911d5cbb09234f17f14240dd415a6b556687f96c))
 
 ### [1.0.11](https://github.com/nrkno/tv-automation-quantel-gateway-client/compare/v1.0.9...v1.0.11) (2020-08-25)
 
-
 ### Bug Fixes
 
-* got requests should resolve with full details, not body only ([ffd8ab4](https://github.com/nrkno/tv-automation-quantel-gateway-client/commit/ffd8ab406e860fd67f4c6a78ba4c421a34e51d4d))
+- got requests should resolve with full details, not body only ([ffd8ab4](https://github.com/nrkno/tv-automation-quantel-gateway-client/commit/ffd8ab406e860fd67f4c6a78ba4c421a34e51d4d))
 
 ### [1.0.10](https://github.com/nrkno/tv-automation-quantel-gateway-client/compare/v1.0.9...v1.0.10) (2020-08-25)
 
