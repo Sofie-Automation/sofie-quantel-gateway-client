@@ -8,8 +8,8 @@ const CHECK_STATUS_INTERVAL = 3000
 const CALL_TIMEOUT = 1000
 
 const MAX_FREE_SOCKETS = 5
-const MAX_SOCKETS_PER_HOST = 1
-const MAX_ALL_SOCKETS = 10
+const MAX_SOCKETS_PER_HOST = 5
+const MAX_ALL_SOCKETS = 25
 const HTTP_TIMEOUT = 5000
 
 const gatewayHTTPAgent = new HTTPAgent({
