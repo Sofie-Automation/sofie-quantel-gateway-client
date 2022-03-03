@@ -1,14 +1,37 @@
 import * as Q from './quantelTypes'
 import * as got from 'got'
+import { Agent as HTTPAgent } from 'http'
+import { Agent as HTTPSAgent } from 'https'
 import { EventEmitter } from 'events'
 
 const CHECK_STATUS_INTERVAL = 3000
 const CALL_TIMEOUT = 1000
 
+const MAX_FREE_SOCKETS = 5
+const MAX_SOCKETS_PER_HOST = 5
+const MAX_ALL_SOCKETS = 25
+const HTTP_TIMEOUT = 5000
+
+const gatewayHTTPAgent = new HTTPAgent({
+	keepAlive: true,
+	maxFreeSockets: MAX_FREE_SOCKETS,
+	maxSockets: MAX_SOCKETS_PER_HOST,
+	maxTotalSockets: MAX_ALL_SOCKETS,
+	timeout: HTTP_TIMEOUT,
+})
+
+const gatewayHTTPSAgent = new HTTPSAgent({
+	keepAlive: true,
+	maxFreeSockets: MAX_FREE_SOCKETS,
+	maxSockets: MAX_SOCKETS_PER_HOST,
+	maxTotalSockets: MAX_ALL_SOCKETS,
+	timeout: HTTP_TIMEOUT,
+})
+
 const literal = <T>(t: T): T => t
 
 /**
- * Remote connection to a [Sofie Quantel Gateway](https://github.com/nrkno/tv-automation-quantel-gateway).
+ * Remote connection to a [Sofie Quantel Gateway](https://github.com/nrkno/sofie-quantel-gateway).
  * Create and initialize a new connection as follows:
  *
  *     const quantelClient = new QuantelGateway()
@@ -616,6 +639,12 @@ export class QuantelGateway extends EventEmitter {
 				timeout: CALL_TIMEOUT,
 				responseType: 'json',
 				resolveBodyOnly: false,
+				// explicitly disable HTTP/2, because it's not tested
+				http2: false,
+				agent: {
+					http: gatewayHTTPAgent,
+					https: gatewayHTTPSAgent,
+				},
 			})
 			if (response.statusCode === 200) {
 				return response.body

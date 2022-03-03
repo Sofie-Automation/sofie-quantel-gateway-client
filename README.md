@@ -4,7 +4,7 @@ This is a part of the [**Sofie** TV News Studio Automation System](https://githu
 
 ## Abstract
 
-A client-side library for the [Sofie Quantel Gateway](https://github.com/nrkno/tv-automation-quantel-gateway).
+A client-side library for the [Sofie Quantel Gateway](https://github.com/nrkno/sofie-quantel-gateway).
 
 ## Usage
 
@@ -51,7 +51,7 @@ Once finished with the class, call `dispose()`.
 ### Documentation
 
 The library is self-documenting using TypeDoc annotations. Details of the REST API
-that this library is a client for can be found in the [Quantel Gateway documentation](https://github.com/nrkno/tv-automation-quantel-gateway#http-api).
+that this library is a client for can be found in the [Quantel Gateway documentation](https://github.com/nrkno/sofie-quantel-gateway#http-api).
 
 ## License
 
