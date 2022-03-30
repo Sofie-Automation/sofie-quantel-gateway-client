@@ -10,7 +10,7 @@ const CALL_TIMEOUT = 1000
 const MAX_FREE_SOCKETS = 5
 const MAX_SOCKETS_PER_HOST = 5
 const MAX_ALL_SOCKETS = 25
-const HTTP_TIMEOUT = 5000
+const HTTP_TIMEOUT = 15 * 1000
 
 const gatewayHTTPAgent = new HTTPAgent({
 	keepAlive: true,
