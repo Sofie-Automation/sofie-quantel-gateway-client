@@ -41,7 +41,7 @@
 	},
 	"license": "MIT",
 	"dependencies": {
-		"got": "^11.8.2"
+		"got": "^11.8.5"
 	},
 	"devDependencies": {
 		"@sofie-automation/code-standard-preset": "^0.2.5",
