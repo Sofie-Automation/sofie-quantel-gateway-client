@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2.0.5](https://github.com/nrkno/tv-automation-quantel-gateway-client/compare/v2.0.4...v2.0.5) (2022-07-05)
+
+### Bug Fixes
+
+- increase HTTP timeout ([2521239](https://github.com/nrkno/tv-automation-quantel-gateway-client/commit/252123980500e5f5e0efeee5992038a3cc50faa9))
+- limit the amount of created concurrent connections ([#5](https://github.com/nrkno/tv-automation-quantel-gateway-client/issues/5)) ([c460f04](https://github.com/nrkno/tv-automation-quantel-gateway-client/commit/c460f04fa7af4610939a67561d6a08aee03d979d))
+
 ### [2.0.4](https://github.com/nrkno/tv-automation-quantel-gateway-client/compare/v2.0.3...v2.0.4) (2021-09-29)
 
 ### [2.0.3](https://github.com/nrkno/tv-automation-quantel-gateway-client/compare/v2.0.3-0...v2.0.3) (2021-09-29)
