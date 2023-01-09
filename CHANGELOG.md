@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [3.0.0](https://github.com/nrkno/tv-automation-quantel-gateway-client/compare/v2.0.5...v3.0.0) (2023-01-09)
+
+### ⚠ BREAKING CHANGES
+
+- update got, upgrade node requirement to Node 14
+
+### Features
+
+- update got, upgrade node requirement to Node 14 ([bd5f322](https://github.com/nrkno/tv-automation-quantel-gateway-client/commit/bd5f322b4caf8ddbedbc1096d2a4f067eacf1b06))
+
 ### [2.0.5](https://github.com/nrkno/tv-automation-quantel-gateway-client/compare/v2.0.4...v2.0.5) (2022-07-05)
 
 ### Bug Fixes
