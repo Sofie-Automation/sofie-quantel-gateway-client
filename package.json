@@ -25,13 +25,10 @@
 		"test:coverage": "yarn test -- --coverage",
 		"cov": "jest --coverage; open-cli coverage/lcov-report/index.html",
 		"cov-open": "open-cli coverage/lcov-report/index.html",
-		"send-coverage": "codecov",
 		"reset": "git clean -dfx && git reset --hard && yarn",
 		"validate:dependencies": "yarn audit --groups dependencies",
 		"validate:dev-dependencies": "yarn audit --groups devDependencies",
-		"release": "standard-version",
-		"release:bump-release": "yarn release",
-		"release:bump-prerelease": "yarn release --prerelease"
+		"release": "sofie-version"
 	},
 	"author": "Johan Nyman <johan@superfly.tv>",
 	"contributors": [
