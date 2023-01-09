@@ -1,5 +1,5 @@
 import * as Q from './quantelTypes'
-import * as got from 'got'
+import got from 'got'
 import { Agent as HTTPAgent } from 'http'
 import { Agent as HTTPSAgent } from 'https'
 import { EventEmitter } from 'events'
@@ -632,7 +632,7 @@ export class QuantelGateway extends EventEmitter {
 	): Promise<T | QuantelErrorResponse> {
 		const url = this.urlQuery(this._gatewayUrl + '/' + resource, queryParameters)
 		try {
-			const response = await got.default<T>({
+			const response = await got<T>({
 				url,
 				method,
 				json: bodyData,
