@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file. See [Convential Commits](https://www.conventionalcommits.org/en/v1.0.0/#specification) for commit guidelines.
 
+## [3.0.3](https://github.com/nrkno/tv-automation-quantel-gateway-client/compare/v3.0.2...v3.0.3) (Wed Jan 11 2023)
+
+### Fixes
+
+- remove automatic retries in requests [8f44740](https://github.com/nrkno/tv-automation-quantel-gateway-client/commit/8f44740ed0b8227b1f97ed260635947cdbdb70db)
+
 ## [3.0.2](https://github.com/nrkno/tv-automation-quantel-gateway-client/compare/v3.0.1...v3.0.2) (Mon Jan 09 2023)
 
 ### [3.0.1](https://github.com/nrkno/tv-automation-quantel-gateway-client/compare/v3.0.0...v3.0.1) (2023-01-09)
