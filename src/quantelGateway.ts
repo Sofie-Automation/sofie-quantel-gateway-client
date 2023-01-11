@@ -11,6 +11,7 @@ const MAX_FREE_SOCKETS = 5
 const MAX_SOCKETS_PER_HOST = 5
 const MAX_ALL_SOCKETS = 25
 const HTTP_TIMEOUT = 15 * 1000
+const RETRIES = 0
 
 const gatewayHTTPAgent = new HTTPAgent({
 	keepAlive: true,
@@ -645,6 +646,7 @@ export class QuantelGateway extends EventEmitter {
 					http: gatewayHTTPAgent,
 					https: gatewayHTTPSAgent,
 				},
+				retry: RETRIES,
 			})
 			if (response.statusCode === 200) {
 				return response.body
