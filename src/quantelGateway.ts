@@ -1,5 +1,6 @@
 import * as Q from './quantelTypes'
 import got from 'got'
+import { CancelableRequest, Response } from 'got'
 import { Agent as HTTPAgent } from 'http'
 import { Agent as HTTPSAgent } from 'https'
 import { EventEmitter } from 'events'
@@ -632,8 +633,9 @@ export class QuantelGateway extends EventEmitter {
 		bodyData?: any
 	): Promise<T | QuantelErrorResponse> {
 		const url = this.urlQuery(this._gatewayUrl + '/' + resource, queryParameters)
+		let response: Response<T> | undefined
 		try {
-			const response = await got<T>({
+			response = await got<T>({
 				url,
 				method,
 				json: bodyData,
@@ -654,6 +656,13 @@ export class QuantelGateway extends EventEmitter {
 				return Promise.reject(new Error(`Bad response from Quantel-Gateway: ${response.statusCode} ${response.body}`))
 			}
 		} catch (e) {
+			{
+				// If possible, cancel the request to close the socket and avoid a buildup of sockets:
+				const cancelResponse = response as unknown as CancelableRequest<Response<T>>
+				if (cancelResponse?.cancel && !cancelResponse.isCanceled) {
+					cancelResponse.cancel()
+				}
+			}
 			const error = e as any
 			if (error.response && error.response.body) {
 				return error.response.body
