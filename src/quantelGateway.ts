@@ -5,7 +5,7 @@ import { Agent as HTTPSAgent } from 'https'
 import { EventEmitter } from 'events'
 
 const CHECK_STATUS_INTERVAL = 3000
-const CALL_TIMEOUT = 1000
+const CALL_TIMEOUT = 5000
 
 const MAX_FREE_SOCKETS = 5
 const MAX_SOCKETS_PER_HOST = 5
