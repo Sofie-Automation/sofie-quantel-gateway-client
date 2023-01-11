@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [Convential Commits](https://www.conventionalcommits.org/en/v1.0.0/#specification) for commit guidelines.
 
+## [3.0.4](https://github.com/nrkno/tv-automation-quantel-gateway-client/compare/v3.0.3...v3.0.4) (Wed Jan 11 2023)
+
+### Fixes
+
+- cancel the socket if there is an error (#8) [bf7b46b](https://github.com/nrkno/tv-automation-quantel-gateway-client/commit/bf7b46b929fbb7f45c84749a6bd63192e2ad06aa)
+- extend call timeout [9afda16](https://github.com/nrkno/tv-automation-quantel-gateway-client/commit/9afda16c772b74888c9d20b4ef229cdff8ff78fd)
+
 ## [3.0.3](https://github.com/nrkno/tv-automation-quantel-gateway-client/compare/v3.0.2...v3.0.3) (Wed Jan 11 2023)
 
 ### Fixes
