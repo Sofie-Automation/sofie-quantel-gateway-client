@@ -10,21 +10,24 @@ const DEFAULT_CALL_TIMEOUT = 5000
 const MAX_FREE_SOCKETS = 5
 const MAX_SOCKETS_PER_HOST = 5
 const MAX_ALL_SOCKETS = 25
+const HTTP_KEEP_ALIVE = 5 * 1000
 const HTTP_TIMEOUT = 30 * 1000
 const HTTP_RETRIES = 0
 
 const gatewayHTTPAgent = new HTTPAgent({
-	keepAlive: false,
+	keepAlive: true,
 	maxFreeSockets: MAX_FREE_SOCKETS,
 	maxSockets: MAX_SOCKETS_PER_HOST,
 	maxTotalSockets: MAX_ALL_SOCKETS,
+	keepAliveMsecs: HTTP_KEEP_ALIVE,
 })
 
 const gatewayHTTPSAgent = new HTTPSAgent({
-	keepAlive: false,
+	keepAlive: true,
 	maxFreeSockets: MAX_FREE_SOCKETS,
 	maxSockets: MAX_SOCKETS_PER_HOST,
 	maxTotalSockets: MAX_ALL_SOCKETS,
+	keepAliveMsecs: HTTP_KEEP_ALIVE,
 })
 
 const literal = <T>(t: T): T => t
@@ -669,7 +672,8 @@ export class QuantelGateway extends EventEmitter {
 				},
 				retry: HTTP_RETRIES,
 				headers: {
-					Connection: 'close',
+					Connection: 'keep-alive',
+					'Keep-Alive': `timeout=${Math.ceil(HTTP_KEEP_ALIVE / 1000)}`,
 				},
 			})
 			if (response.statusCode === 200) {
