@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file. See [Convential Commits](https://www.conventionalcommits.org/en/v1.0.0/#specification) for commit guidelines.
 
+## [3.1.0](https://github.com/nrkno/tv-automation-quantel-gateway-client/compare/v3.0.4...v3.1.0) (Thu Jan 12 2023)
+
+### Features
+
+- configurable call timeout [5194a8d](https://github.com/nrkno/tv-automation-quantel-gateway-client/commit/5194a8d096ce33f79d10786b6cc04ec6bda38913)
+
 ## [3.0.4](https://github.com/nrkno/tv-automation-quantel-gateway-client/compare/v3.0.3...v3.0.4) (Wed Jan 11 2023)
 
 ### Fixes
