@@ -644,9 +644,26 @@ export class QuantelGateway extends EventEmitter {
 		return Promise.race([
 			this.sendRawInner<T>(method, resource, queryParameters, bodyData),
 			new Promise<T>((_, reject) =>
-				setTimeout(() => reject(new Error('Call to Quantel Gateway timed out')), this._callTimeout)
+				setTimeout(
+					() =>
+						reject(
+							new Error(
+								`Call to Quantel Gateway timed out: ${method} ${resource} ${QuantelGateway.stringifyQueryParameters(
+									queryParameters
+								)}`
+							)
+						),
+					this._callTimeout
+				)
 			),
 		])
+	}
+
+	private static stringifyQueryParameters(queryParameters?: QueryParameters): string {
+		if (!queryParameters) return ''
+		return Object.entries(queryParameters)
+			.map(([key, value]) => `${key}=${value}`)
+			.join('&')
 	}
 
 	private async sendRawInner<T>(
