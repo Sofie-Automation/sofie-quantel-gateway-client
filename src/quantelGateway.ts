@@ -5,13 +5,13 @@ import { Agent as HTTPAgent } from 'http'
 import { Agent as HTTPSAgent } from 'https'
 import { EventEmitter } from 'events'
 
-const CHECK_STATUS_INTERVAL = 3000
-const CALL_TIMEOUT = 5000
+const DEFAULT_CHECK_STATUS_INTERVAL = 3000
+const DEFAULT_CALL_TIMEOUT = 5000
 
 const MAX_FREE_SOCKETS = 5
 const MAX_SOCKETS_PER_HOST = 5
 const MAX_ALL_SOCKETS = 25
-const HTTP_TIMEOUT = 15 * 1000
+const HTTP_TIMEOUT = 30 * 1000
 const RETRIES = 0
 
 const gatewayHTTPAgent = new HTTPAgent({
@@ -50,7 +50,8 @@ const literal = <T>(t: T): T => t
  * Once finished with the class, call `dispose()`.
  */
 export class QuantelGateway extends EventEmitter {
-	public readonly checkStatusInterval: number = CHECK_STATUS_INTERVAL
+	private _checkStatusInterval: number = DEFAULT_CHECK_STATUS_INTERVAL
+	private _callTimeout: number = DEFAULT_CALL_TIMEOUT
 
 	private _gatewayUrl: string | undefined
 	private _initialized = false
@@ -65,8 +66,10 @@ export class QuantelGateway extends EventEmitter {
 	private _connected = false
 
 	/** Create a Quantel Gateway client. */
-	constructor() {
+	constructor(config?: { timeout?: number; checkStatusInterval?: number }) {
 		super()
+		this._checkStatusInterval = config?.checkStatusInterval ?? DEFAULT_CHECK_STATUS_INTERVAL
+		this._callTimeout = config?.timeout ?? DEFAULT_CALL_TIMEOUT
 	}
 
 	/**
@@ -103,6 +106,10 @@ export class QuantelGateway extends EventEmitter {
 		await this.setServerId(serverId)
 
 		this._initialized = true
+	}
+
+	get checkStatusInterval(): number {
+		return this._checkStatusInterval
 	}
 
 	/**
@@ -201,7 +208,7 @@ export class QuantelGateway extends EventEmitter {
 		}
 		this._monitorInterval = setInterval(() => {
 			checkServerStatus()
-		}, this.checkStatusInterval)
+		}, this._checkStatusInterval)
 		checkServerStatus() // also run one right away
 	}
 
@@ -611,7 +618,7 @@ export class QuantelGateway extends EventEmitter {
 		queryParameters?: QueryParameters,
 		bodyData?: any
 	): Promise<T | QuantelErrorResponse> {
-		const responseBody = await this.sendRawInner<T>(method, resource, queryParameters, bodyData)
+		const responseBody = await this.sendRawWithTimeout<T>(method, resource, queryParameters, bodyData)
 
 		if (
 			this._isAnErrorResponse(responseBody) &&
@@ -620,10 +627,26 @@ export class QuantelGateway extends EventEmitter {
 		) {
 			await this.reconnectToISA()
 			// Then try again:
-			return this.sendRawInner(method, resource, queryParameters, bodyData)
+			return this.sendRawWithTimeout(method, resource, queryParameters, bodyData)
 		} else {
 			return responseBody
 		}
+	}
+
+	private async sendRawWithTimeout<T>(
+		method: Methods,
+		resource: string,
+		queryParameters?: QueryParameters,
+		bodyData?: any
+	): Promise<T | QuantelErrorResponse> {
+		if (!Number.isFinite(this._callTimeout)) return this.sendRawInner<T>(method, resource, queryParameters, bodyData)
+
+		return Promise.race([
+			this.sendRawInner<T>(method, resource, queryParameters, bodyData),
+			new Promise<T>((_, reject) =>
+				setTimeout(() => reject(new Error('Call to Quantel Gateway timed out')), this._callTimeout)
+			),
+		])
 	}
 
 	private async sendRawInner<T>(
@@ -633,13 +656,13 @@ export class QuantelGateway extends EventEmitter {
 		bodyData?: any
 	): Promise<T | QuantelErrorResponse> {
 		const url = this.urlQuery(this._gatewayUrl + '/' + resource, queryParameters)
-		let response: Response<T> | undefined
+		let request: CancelableRequest<Response<T>> | undefined
 		try {
-			response = await got<T>({
+			request = got<T>({
 				url,
 				method,
 				json: bodyData,
-				timeout: CALL_TIMEOUT,
+				timeout: HTTP_TIMEOUT,
 				responseType: 'json',
 				resolveBodyOnly: false,
 				// explicitly disable HTTP/2, because it's not tested
@@ -650,21 +673,24 @@ export class QuantelGateway extends EventEmitter {
 				},
 				retry: RETRIES,
 			})
+			const response = await request
 			if (response.statusCode === 200) {
+				response.destroy()
 				return response.body
 			} else {
+				response.destroy()
 				return Promise.reject(new Error(`Bad response from Quantel-Gateway: ${response.statusCode} ${response.body}`))
 			}
 		} catch (e) {
 			{
 				// If possible, cancel the request to close the socket and avoid a buildup of sockets:
-				const cancelResponse = response as unknown as CancelableRequest<Response<T>>
-				if (cancelResponse?.cancel && !cancelResponse.isCanceled) {
-					cancelResponse.cancel()
+				if (request?.cancel && !request.isCanceled) {
+					request.cancel()
 				}
 			}
 			const error = e as any
 			if (error.response && error.response.body) {
+				if (typeof error.response.destroy === 'function') error.response.destroy()
 				return error.response.body
 			} else {
 				throw error
