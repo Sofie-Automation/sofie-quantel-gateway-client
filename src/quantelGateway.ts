@@ -1,6 +1,5 @@
 import * as Q from './quantelTypes'
 import got from 'got'
-import { CancelableRequest, Response } from 'got'
 import { Agent as HTTPAgent } from 'http'
 import { Agent as HTTPSAgent } from 'https'
 import { EventEmitter } from 'events'
@@ -12,22 +11,20 @@ const MAX_FREE_SOCKETS = 5
 const MAX_SOCKETS_PER_HOST = 5
 const MAX_ALL_SOCKETS = 25
 const HTTP_TIMEOUT = 30 * 1000
-const RETRIES = 0
+const HTTP_RETRIES = 0
 
 const gatewayHTTPAgent = new HTTPAgent({
-	keepAlive: true,
+	keepAlive: false,
 	maxFreeSockets: MAX_FREE_SOCKETS,
 	maxSockets: MAX_SOCKETS_PER_HOST,
 	maxTotalSockets: MAX_ALL_SOCKETS,
-	timeout: HTTP_TIMEOUT,
 })
 
 const gatewayHTTPSAgent = new HTTPSAgent({
-	keepAlive: true,
+	keepAlive: false,
 	maxFreeSockets: MAX_FREE_SOCKETS,
 	maxSockets: MAX_SOCKETS_PER_HOST,
 	maxTotalSockets: MAX_ALL_SOCKETS,
-	timeout: HTTP_TIMEOUT,
 })
 
 const literal = <T>(t: T): T => t
@@ -656,9 +653,8 @@ export class QuantelGateway extends EventEmitter {
 		bodyData?: any
 	): Promise<T | QuantelErrorResponse> {
 		const url = this.urlQuery(this._gatewayUrl + '/' + resource, queryParameters)
-		let request: CancelableRequest<Response<T>> | undefined
 		try {
-			request = got<T>({
+			const response = await got<T>({
 				url,
 				method,
 				json: bodyData,
@@ -671,26 +667,19 @@ export class QuantelGateway extends EventEmitter {
 					http: gatewayHTTPAgent,
 					https: gatewayHTTPSAgent,
 				},
-				retry: RETRIES,
+				retry: HTTP_RETRIES,
+				headers: {
+					Connection: 'close',
+				},
 			})
-			const response = await request
 			if (response.statusCode === 200) {
-				response.destroy()
 				return response.body
 			} else {
-				response.destroy()
 				return Promise.reject(new Error(`Bad response from Quantel-Gateway: ${response.statusCode} ${response.body}`))
 			}
 		} catch (e) {
-			{
-				// If possible, cancel the request to close the socket and avoid a buildup of sockets:
-				if (request?.cancel && !request.isCanceled) {
-					request.cancel()
-				}
-			}
 			const error = e as any
 			if (error.response && error.response.body) {
-				if (typeof error.response.destroy === 'function') error.response.destroy()
 				return error.response.body
 			} else {
 				throw error
