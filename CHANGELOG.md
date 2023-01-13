@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file. See [Convential Commits](https://www.conventionalcommits.org/en/v1.0.0/#specification) for commit guidelines.
 
+## [3.1.4-0](https://github.com/nrkno/tv-automation-quantel-gateway-client/compare/v3.1.3-0...v3.1.4-0) (Fri Jan 13 2023)
+
+### Fixes
+
+- increase Quantel Gateway HTTP Keep-Alive to 60s [effc11a](https://github.com/nrkno/tv-automation-quantel-gateway-client/commit/effc11a7e143384089aac7aadf8de90256f1386f)
+
 ## [3.1.3-0](https://github.com/nrkno/tv-automation-quantel-gateway-client/compare/v3.1.2-0...v3.1.3-0) (Thu Jan 12 2023)
 
 ### Fixes
