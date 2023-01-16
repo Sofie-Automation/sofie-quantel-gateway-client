@@ -2,6 +2,8 @@
 
 All notable changes to this project will be documented in this file. See [Convential Commits](https://www.conventionalcommits.org/en/v1.0.0/#specification) for commit guidelines.
 
+## [3.1.4](https://github.com/nrkno/tv-automation-quantel-gateway-client/compare/v3.1.4-0...v3.1.4) (Mon Jan 16 2023)
+
 ## [3.1.4-0](https://github.com/nrkno/tv-automation-quantel-gateway-client/compare/v3.1.3-0...v3.1.4-0) (Fri Jan 13 2023)
 
 ### Fixes
