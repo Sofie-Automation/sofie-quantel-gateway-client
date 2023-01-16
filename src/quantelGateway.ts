@@ -581,6 +581,16 @@ export class QuantelGateway extends EventEmitter {
 		return response
 	}
 
+	public getHTTPAgents(): Readonly<{
+		http: HTTPAgent
+		https: HTTPSAgent
+	}> {
+		return {
+			http: gatewayHTTPAgent,
+			https: gatewayHTTPSAgent,
+		}
+	}
+
 	private async sendServer<T>(
 		method: Methods,
 		resource: string,
