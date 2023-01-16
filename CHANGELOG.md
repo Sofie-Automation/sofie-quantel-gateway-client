@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file. See [Convential Commits](https://www.conventionalcommits.org/en/v1.0.0/#specification) for commit guidelines.
 
+## [3.1.7-agent-debug-20230116-221517-1050c87.0](https://github.com/nrkno/tv-automation-quantel-gateway-client/compare/v3.1.6-agent-debug-20230116-213150-3920987.0...v3.1.7-agent-debug-20230116-221517-1050c87.0) (Mon Jan 16 2023)
+
+### Fixes
+
+- add free socket timeout [1050c87](https://github.com/nrkno/tv-automation-quantel-gateway-client/commit/1050c877fc38c23938c3d529504cc48a5522b738)
+
 ## [3.1.6-agent-debug-20230116-213150-3920987.0](https://github.com/nrkno/tv-automation-quantel-gateway-client/compare/v3.1.5-0...v3.1.6-agent-debug-20230116-213150-3920987.0) (Mon Jan 16 2023)
 
 ## [3.1.5-0](https://github.com/nrkno/tv-automation-quantel-gateway-client/compare/v3.1.4-0...v3.1.5-0) (Mon Jan 16 2023)
