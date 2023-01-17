@@ -1,6 +1,6 @@
 {
 	"name": "tv-automation-quantel-gateway-client",
-	"version": "3.1.8-agent-debug-20230117-150639-fe61d16.0",
+	"version": "3.1.9-agent-debug-20230117-153154-6d4f9ec.0",
 	"description": "Quantel gateway client library",
 	"engines": {
 		"node": "^14.18 || ^16.14 || >=18.0"
