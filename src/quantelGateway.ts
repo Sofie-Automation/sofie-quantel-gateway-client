@@ -3,6 +3,7 @@ import got from 'got'
 import { Agent as HTTPAgent } from 'http'
 import { Agent as HTTPSAgent } from 'https'
 import { EventEmitter } from 'events'
+import PQueue from 'p-queue/dist/index'
 
 const DEFAULT_CHECK_STATUS_INTERVAL = 3000
 const DEFAULT_CALL_TIMEOUT = 5000
@@ -68,7 +69,10 @@ export class QuantelGateway extends EventEmitter {
 	private _cachedServer: Q.ServerInfo | undefined
 	private _monitorPorts: MonitorPorts = {}
 	private _connected = false
-	private _requestCount = 0
+	private _requestQueue = new PQueue({
+		autoStart: true,
+		concurrency: MAX_SOCKETS_PER_HOST,
+	})
 
 	/** Create a Quantel Gateway client. */
 	constructor(config?: { timeout?: number; checkStatusInterval?: number }) {
@@ -688,33 +692,27 @@ export class QuantelGateway extends EventEmitter {
 		bodyData?: any
 	): Promise<T | QuantelErrorResponse> {
 		const url = this.urlQuery(this._gatewayUrl + '/' + resource, queryParameters)
-		if (this._requestCount >= MAX_SOCKETS_PER_HOST)
-			return Promise.reject(`Too many concurrent requests: ${this._requestCount}`)
-
 		try {
-			this._requestCount++
-
-			const response = await got<T>({
-				url,
-				method,
-				json: bodyData,
-				timeout: HTTP_TIMEOUT,
-				responseType: 'json',
-				resolveBodyOnly: false,
-				// explicitly disable HTTP/2, because it's not tested
-				http2: false,
-				agent: {
-					http: gatewayHTTPAgent,
-					https: gatewayHTTPSAgent,
-				},
-				retry: HTTP_RETRIES,
-				headers: {
-					'Keep-Alive': `timeout=${Math.ceil(HTTP_KEEP_ALIVE / 1000)}`,
-				},
-			})
-
-			this._requestCount--
-
+			const response = await this._requestQueue.add(() =>
+				got<T>({
+					url,
+					method,
+					json: bodyData,
+					timeout: HTTP_TIMEOUT,
+					responseType: 'json',
+					resolveBodyOnly: false,
+					// explicitly disable HTTP/2, because it's not tested
+					http2: false,
+					agent: {
+						http: gatewayHTTPAgent,
+						https: gatewayHTTPSAgent,
+					},
+					retry: HTTP_RETRIES,
+					headers: {
+						'Keep-Alive': `timeout=${Math.ceil(HTTP_KEEP_ALIVE / 1000)}`,
+					},
+				})
+			)
 			if (response.statusCode === 200) {
 				return response.body
 			} else {
@@ -727,27 +725,19 @@ export class QuantelGateway extends EventEmitter {
 
 				const socket = error.request.socket
 				const hardTimeout = setTimeout(() => {
-					this._requestCount--
-
 					if (socket.destroyed) return
 					this.emit('error', 'HTTP_HARD_TIMEOUT elapsed on a Socket')
 					socket.destroy()
 				}, HTTP_HARD_TIMEOUT)
 				const clearHardTimeout = () => {
-					this._requestCount--
-
 					clearTimeout(hardTimeout)
 				}
 				socket.on('close', clearHardTimeout)
 
 				throw error
 			} else if (error.response && error.response.body) {
-				this._requestCount--
-
 				return error.response.body
 			} else {
-				this._requestCount--
-
 				throw error
 			}
 		}
