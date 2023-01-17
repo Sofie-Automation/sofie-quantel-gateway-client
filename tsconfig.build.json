@@ -10,7 +10,6 @@
 			"*": ["./node_modules/*"],
 			"{{PACKAGE-NAME}}": ["./src/index.ts"]
 		},
-		"types": ["node"],
-		"esModuleInterop": true
+		"types": ["node"]
 	}
 }

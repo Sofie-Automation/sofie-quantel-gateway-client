@@ -3,7 +3,6 @@ import got from 'got'
 import { Agent as HTTPAgent } from 'http'
 import { Agent as HTTPSAgent } from 'https'
 import { EventEmitter } from 'events'
-import PQueue from 'p-queue/dist/index'
 
 const DEFAULT_CHECK_STATUS_INTERVAL = 3000
 const DEFAULT_CALL_TIMEOUT = 5000
@@ -69,10 +68,7 @@ export class QuantelGateway extends EventEmitter {
 	private _cachedServer: Q.ServerInfo | undefined
 	private _monitorPorts: MonitorPorts = {}
 	private _connected = false
-	private _requestQueue = new PQueue({
-		autoStart: true,
-		concurrency: MAX_SOCKETS_PER_HOST,
-	})
+	private _busy = false
 
 	/** Create a Quantel Gateway client. */
 	constructor(config?: { timeout?: number; checkStatusInterval?: number }) {
@@ -637,9 +633,7 @@ export class QuantelGateway extends EventEmitter {
 		queryParameters?: QueryParameters,
 		bodyData?: any
 	): Promise<T | QuantelErrorResponse> {
-		const responseBody = await this._requestQueue.add(async () =>
-			this.sendRawWithTimeout<T>(method, resource, queryParameters, bodyData)
-		)
+		const responseBody = await this.sendRawWithTimeout<T>(method, resource, queryParameters, bodyData)
 
 		if (
 			this._isAnErrorResponse(responseBody) &&
@@ -648,9 +642,7 @@ export class QuantelGateway extends EventEmitter {
 		) {
 			await this.reconnectToISA()
 			// Then try again:
-			return await this._requestQueue.add(async () =>
-				this.sendRawWithTimeout(method, resource, queryParameters, bodyData)
-			)
+			return this.sendRawWithTimeout(method, resource, queryParameters, bodyData)
 		} else {
 			return responseBody
 		}
@@ -662,6 +654,7 @@ export class QuantelGateway extends EventEmitter {
 		queryParameters?: QueryParameters,
 		bodyData?: any
 	): Promise<T | QuantelErrorResponse> {
+		if (this._busy) return Promise.reject('Quantel Gateway is still busy with previous request')
 		if (!Number.isFinite(this._callTimeout)) return this.sendRawInner<T>(method, resource, queryParameters, bodyData)
 
 		return Promise.race([
@@ -697,6 +690,7 @@ export class QuantelGateway extends EventEmitter {
 	): Promise<T | QuantelErrorResponse> {
 		const url = this.urlQuery(this._gatewayUrl + '/' + resource, queryParameters)
 		try {
+			this._busy = true
 			const response = await got<T>({
 				url,
 				method,
@@ -715,12 +709,15 @@ export class QuantelGateway extends EventEmitter {
 					'Keep-Alive': `timeout=${Math.ceil(HTTP_KEEP_ALIVE / 1000)}`,
 				},
 			})
+			this._busy = false
 			if (response.statusCode === 200) {
 				return response.body
 			} else {
 				return Promise.reject(new Error(`Bad response from Quantel-Gateway: ${response.statusCode} ${response.body}`))
 			}
 		} catch (e) {
+			this._busy = false
+
 			const error = e as any
 			if (error instanceof got.TimeoutError) {
 				if (!error.request.socket || error.request.socket.destroyed) throw error
