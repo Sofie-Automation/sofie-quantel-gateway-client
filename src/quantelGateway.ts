@@ -637,7 +637,9 @@ export class QuantelGateway extends EventEmitter {
 		queryParameters?: QueryParameters,
 		bodyData?: any
 	): Promise<T | QuantelErrorResponse> {
-		const responseBody = this.sendRawWithTimeout<T>(method, resource, queryParameters, bodyData)
+		const responseBody = await this._requestQueue.add(async () =>
+			this.sendRawWithTimeout<T>(method, resource, queryParameters, bodyData)
+		)
 
 		if (
 			this._isAnErrorResponse(responseBody) &&
@@ -646,7 +648,9 @@ export class QuantelGateway extends EventEmitter {
 		) {
 			await this.reconnectToISA()
 			// Then try again:
-			return this.sendRawWithTimeout(method, resource, queryParameters, bodyData)
+			return await this._requestQueue.add(async () =>
+				this.sendRawWithTimeout(method, resource, queryParameters, bodyData)
+			)
 		} else {
 			return responseBody
 		}
@@ -693,26 +697,24 @@ export class QuantelGateway extends EventEmitter {
 	): Promise<T | QuantelErrorResponse> {
 		const url = this.urlQuery(this._gatewayUrl + '/' + resource, queryParameters)
 		try {
-			const response = await this._requestQueue.add(() =>
-				got<T>({
-					url,
-					method,
-					json: bodyData,
-					timeout: HTTP_TIMEOUT,
-					responseType: 'json',
-					resolveBodyOnly: false,
-					// explicitly disable HTTP/2, because it's not tested
-					http2: false,
-					agent: {
-						http: gatewayHTTPAgent,
-						https: gatewayHTTPSAgent,
-					},
-					retry: HTTP_RETRIES,
-					headers: {
-						'Keep-Alive': `timeout=${Math.ceil(HTTP_KEEP_ALIVE / 1000)}`,
-					},
-				})
-			)
+			const response = await got<T>({
+				url,
+				method,
+				json: bodyData,
+				timeout: HTTP_TIMEOUT,
+				responseType: 'json',
+				resolveBodyOnly: false,
+				// explicitly disable HTTP/2, because it's not tested
+				http2: false,
+				agent: {
+					http: gatewayHTTPAgent,
+					https: gatewayHTTPSAgent,
+				},
+				retry: HTTP_RETRIES,
+				headers: {
+					'Keep-Alive': `timeout=${Math.ceil(HTTP_KEEP_ALIVE / 1000)}`,
+				},
+			})
 			if (response.statusCode === 200) {
 				return response.body
 			} else {
@@ -726,7 +728,6 @@ export class QuantelGateway extends EventEmitter {
 				const socket = error.request.socket
 				const hardTimeout = setTimeout(() => {
 					if (socket.destroyed) return
-					this.emit('error', 'HTTP_HARD_TIMEOUT elapsed on a Socket')
 					socket.destroy()
 				}, HTTP_HARD_TIMEOUT)
 				const clearHardTimeout = () => {
