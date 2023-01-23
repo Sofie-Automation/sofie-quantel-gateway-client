@@ -12,6 +12,8 @@ const MAX_SOCKETS_PER_HOST = 5
 const MAX_ALL_SOCKETS = 25
 const HTTP_KEEP_ALIVE = 60 * 1000
 const HTTP_TIMEOUT = 30 * 1000
+const HTTP_HARD_TIMEOUT = 2000
+const HTTP_FREE_SOCKET_TIMEOUT = HTTP_TIMEOUT + 1000
 const HTTP_RETRIES = 0
 
 const gatewayHTTPAgent = new HTTPAgent({
@@ -20,6 +22,7 @@ const gatewayHTTPAgent = new HTTPAgent({
 	maxSockets: MAX_SOCKETS_PER_HOST,
 	maxTotalSockets: MAX_ALL_SOCKETS,
 	keepAliveMsecs: HTTP_KEEP_ALIVE,
+	timeout: HTTP_FREE_SOCKET_TIMEOUT,
 })
 
 const gatewayHTTPSAgent = new HTTPSAgent({
@@ -28,6 +31,7 @@ const gatewayHTTPSAgent = new HTTPSAgent({
 	maxSockets: MAX_SOCKETS_PER_HOST,
 	maxTotalSockets: MAX_ALL_SOCKETS,
 	keepAliveMsecs: HTTP_KEEP_ALIVE,
+	timeout: HTTP_FREE_SOCKET_TIMEOUT,
 })
 
 const literal = <T>(t: T): T => t
@@ -580,6 +584,16 @@ export class QuantelGateway extends EventEmitter {
 		return response
 	}
 
+	public getHTTPAgents(): Readonly<{
+		http: HTTPAgent
+		https: HTTPSAgent
+	}> {
+		return {
+			http: gatewayHTTPAgent,
+			https: gatewayHTTPSAgent,
+		}
+	}
+
 	private async sendServer<T>(
 		method: Methods,
 		resource: string,
@@ -648,9 +662,9 @@ export class QuantelGateway extends EventEmitter {
 					() =>
 						reject(
 							new Error(
-								`Call to Quantel Gateway timed out: ${method} ${resource} ${QuantelGateway.stringifyQueryParameters(
-									queryParameters
-								)}`
+								`Call to Quantel Gateway timed out after ${
+									this._callTimeout
+								}ms: ${method} ${resource} ${QuantelGateway.stringifyQueryParameters(queryParameters)}`
 							)
 						),
 					this._callTimeout
@@ -689,7 +703,6 @@ export class QuantelGateway extends EventEmitter {
 				},
 				retry: HTTP_RETRIES,
 				headers: {
-					Connection: 'keep-alive',
 					'Keep-Alive': `timeout=${Math.ceil(HTTP_KEEP_ALIVE / 1000)}`,
 				},
 			})
@@ -700,7 +713,21 @@ export class QuantelGateway extends EventEmitter {
 			}
 		} catch (e) {
 			const error = e as any
-			if (error.response && error.response.body) {
+			if (error instanceof got.TimeoutError) {
+				if (!error.request.socket || error.request.socket.destroyed) throw error
+
+				const socket = error.request.socket
+				const hardTimeout = setTimeout(() => {
+					if (socket.destroyed) return
+					socket.destroy()
+				}, HTTP_HARD_TIMEOUT)
+				const clearHardTimeout = () => {
+					clearTimeout(hardTimeout)
+				}
+				socket.on('close', clearHardTimeout)
+
+				throw error
+			} else if (error.response && error.response.body) {
 				return error.response.body
 			} else {
 				throw error
