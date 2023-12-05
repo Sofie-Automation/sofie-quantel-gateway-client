@@ -1,14 +1,18 @@
-# Sofie: The Modern TV News Studio Automation System (Quantel gateway client)
+# Sofie Quantel Gateway client
 
-This is a part of the [**Sofie** TV News Studio Automation System](https://github.com/nrkno/Sofie-TV-automation/).
+This is the _Quantel Gateway Client_ library, a part of the [**Sofie** TV Automation System](https://github.com/nrkno/Sofie-TV-automation/). This client-side library is used for communication to the [Sofie Quantel Gateway](https://github.com/nrkno/sofie-quantel-gateway).
 
-## Abstract
+## General Sofie System Information
+* [_Sofie_ Documentation](https://nrkno.github.io/sofie-core/)
+* [_Sofie_ Releases](https://nrkno.github.io/sofie-core/releases)
+* [Contribution Guidelines](CONTRIBUTING.md)
+* [License](LICENSE)
 
-A client-side library for the [Sofie Quantel Gateway](https://github.com/nrkno/sofie-quantel-gateway).
+---
 
 ## Usage
 
-### Pre-requisites
+### Prerequisites
 
 - A Quantel ISA SQ system and the IP address or DNS name of the ISA manager(s).
 - An installed and running Quantel Gateway, with IP address and port number.
@@ -21,7 +25,7 @@ included. One of:
     npm install quantel-gateway-client
     yarn add quantel-gateway-client
 
-### Using in an application
+### Usage in an Application
 
 Create a Quantel Gateway Client instance and initialize it to connect to to the gateway.
 
@@ -50,12 +54,8 @@ Once finished with the class, call `dispose()`.
 
 ### Documentation
 
-The library is self-documenting using TypeDoc annotations. Details of the REST API
-that this library is a client for can be found in the [Quantel Gateway documentation](https://github.com/nrkno/sofie-quantel-gateway#http-api).
+The library is self-documenting using TypeDoc annotations. Details of the REST API that this library is a client for can be found in the [Quantel Gateway documentation](https://github.com/nrkno/sofie-quantel-gateway#http-api).
 
-## License
-
-[MIT](./LICENSE).
 
 ---
 
