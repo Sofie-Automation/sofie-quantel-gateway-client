@@ -1,6 +1,6 @@
-# Sofie ATEM State Library
+# Sofie Quantel Gateway client
 
-This is the _Quantel Gateway Client_ library, a part of the [**Sofie** TV Automation System](https://github.com/nrkno/Sofie-TV-automation/). This client-side library is used for communication in the [Sofie Quantel Gateway](https://github.com/nrkno/sofie-quantel-gateway).
+This is the _Quantel Gateway Client_ library, a part of the [**Sofie** TV Automation System](https://github.com/nrkno/Sofie-TV-automation/). This client-side library is used for communication to the [Sofie Quantel Gateway](https://github.com/nrkno/sofie-quantel-gateway).
 
 ## General Sofie System Information
 * [_Sofie_ Documentation](https://nrkno.github.io/sofie-core/)
