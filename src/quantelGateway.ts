@@ -676,7 +676,7 @@ export class QuantelGateway extends EventEmitter {
 			body,
 		})
 
-		if (response.headers.get('content-type') === 'application/json') {
+		if (response.headers.get('content-type')?.startsWith('application/json')) {
 			return response.json() as Promise<T | QuantelErrorResponse>
 		} else {
 			return response.text() as Promise<T>
