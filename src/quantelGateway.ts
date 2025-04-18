@@ -653,22 +653,33 @@ export class QuantelGateway extends EventEmitter {
 	): Promise<T | QuantelErrorResponse> {
 		const url = this.urlQuery(this._gatewayUrl + '/' + resource, queryParameters)
 
+		let body: string | undefined = undefined
+
+		const headers: Record<string, string> = {
+			'keep-alive': `timeout=${Math.ceil(HTTP_KEEP_ALIVE / 1000)}`,
+		}
+
+		if (bodyData && typeof bodyData === 'string') {
+			body = bodyData
+			headers['content-type'] = 'text/plain'
+		} else if (bodyData) {
+			body = JSON.stringify(bodyData)
+			headers['content-type'] = 'application/json'
+		}
+
 		const response = await fetch(url, {
 			method,
 			agent: (url) => (url.protocol === 'https:' ? gatewayHTTPSAgent : gatewayHTTPAgent),
 			redirect: 'follow',
 			signal: AbortSignal.timeout(this._callTimeout),
-			headers: {
-				'Keep-Alive': `timeout=${Math.ceil(HTTP_KEEP_ALIVE / 1000)}`,
-			},
-			body: typeof bodyData !== 'string' ? JSON.stringify(bodyData) : bodyData,
+			headers,
+			body,
 		})
 
-		if (response.ok) {
-			return response.json() as Promise<T>
+		if (response.headers.get('content-type') === 'application/json') {
+			return response.json() as Promise<T | QuantelErrorResponse>
 		} else {
-			const responseBody = await response.text()
-			return Promise.reject(new Error(`Bad response from Quantel-Gateway: ${response.status} ${responseBody}`))
+			return response.text() as Promise<T>
 		}
 	}
 
