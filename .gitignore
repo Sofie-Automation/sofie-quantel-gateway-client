@@ -7,3 +7,7 @@ package-lock.json
 yarn-error.log
 /lib
 /dist
+
+/.yarn/cache
+/.yarn/unplugged
+/.yarn/install-state.gz

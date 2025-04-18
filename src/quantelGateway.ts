@@ -1,5 +1,5 @@
-import * as Q from './quantelTypes'
-import got from 'got'
+import * as Q from './quantelTypes.js'
+import fetch from 'node-fetch'
 import { Agent as HTTPAgent } from 'http'
 import { Agent as HTTPSAgent } from 'https'
 import { EventEmitter } from 'events'
@@ -12,9 +12,7 @@ const MAX_SOCKETS_PER_HOST = 5
 const MAX_ALL_SOCKETS = 25
 const HTTP_KEEP_ALIVE = 60 * 1000
 const HTTP_TIMEOUT = 30 * 1000
-const HTTP_HARD_TIMEOUT = 2000
 const HTTP_FREE_SOCKET_TIMEOUT = HTTP_TIMEOUT + 1000
-const HTTP_RETRIES = 0
 
 const gatewayHTTPAgent = new HTTPAgent({
 	keepAlive: true,
@@ -62,7 +60,7 @@ export class QuantelGateway extends EventEmitter {
 	private _ISAUrls: string[] = []
 	private _zoneId: string | undefined
 	private _serverId: number | undefined
-	private _monitorInterval: NodeJS.Timer | undefined
+	private _monitorInterval: NodeJS.Timeout | undefined
 
 	private _statusMessage: string | null = 'Initializing...' // null = all good
 	private _cachedServer: Q.ServerInfo | undefined
@@ -165,7 +163,7 @@ export class QuantelGateway extends EventEmitter {
 
 				const serverErrors: string[] = []
 
-				for (const [monitorPortId, monitorPort] of Object.entries(this._monitorPorts)) {
+				for (const [monitorPortId, monitorPort] of Object.entries<{ channels: number[] }>(this._monitorPorts)) {
 					const portExists = server.portNames
 						? server.portNames.find((portName) => portName === monitorPortId)
 						: undefined
@@ -653,91 +651,30 @@ export class QuantelGateway extends EventEmitter {
 		queryParameters?: QueryParameters,
 		bodyData?: any
 	): Promise<T | QuantelErrorResponse> {
-		if (!Number.isFinite(this._callTimeout)) return this.sendRawInner<T>(method, resource, queryParameters, bodyData)
-
-		return Promise.race([
-			this.sendRawInner<T>(method, resource, queryParameters, bodyData),
-			new Promise<T>((_, reject) =>
-				setTimeout(
-					() =>
-						reject(
-							new Error(
-								`Call to Quantel Gateway timed out after ${
-									this._callTimeout
-								}ms: ${method} ${resource} ${QuantelGateway.stringifyQueryParameters(queryParameters)}`
-							)
-						),
-					this._callTimeout
-				)
-			),
-		])
-	}
-
-	private static stringifyQueryParameters(queryParameters?: QueryParameters): string {
-		if (!queryParameters) return ''
-		return Object.entries(queryParameters)
-			.map(([key, value]) => `${key}=${value}`)
-			.join('&')
-	}
-
-	private async sendRawInner<T>(
-		method: Methods,
-		resource: string,
-		queryParameters?: QueryParameters,
-		bodyData?: any
-	): Promise<T | QuantelErrorResponse> {
 		const url = this.urlQuery(this._gatewayUrl + '/' + resource, queryParameters)
-		try {
-			const response = await got<T>({
-				url,
-				method,
-				json: bodyData,
-				timeout: HTTP_TIMEOUT,
-				responseType: 'json',
-				resolveBodyOnly: false,
-				// explicitly disable HTTP/2, because it's not tested
-				http2: false,
-				agent: {
-					http: gatewayHTTPAgent,
-					https: gatewayHTTPSAgent,
-				},
-				retry: HTTP_RETRIES,
-				headers: {
-					'Keep-Alive': `timeout=${Math.ceil(HTTP_KEEP_ALIVE / 1000)}`,
-				},
-			})
-			if (response.statusCode === 200) {
-				return response.body
-			} else {
-				return Promise.reject(new Error(`Bad response from Quantel-Gateway: ${response.statusCode} ${response.body}`))
-			}
-		} catch (e) {
-			const error = e as any
-			if (error instanceof got.TimeoutError) {
-				if (!error.request.socket || error.request.socket.destroyed) throw error
 
-				const socket = error.request.socket
-				const hardTimeout = setTimeout(() => {
-					if (socket.destroyed) return
-					socket.destroy()
-				}, HTTP_HARD_TIMEOUT)
-				const clearHardTimeout = () => {
-					clearTimeout(hardTimeout)
-				}
-				socket.on('close', clearHardTimeout)
+		const response = await fetch(url, {
+			method,
+			agent: (url) => (url.protocol === 'https:' ? gatewayHTTPSAgent : gatewayHTTPAgent),
+			redirect: 'follow',
+			signal: AbortSignal.timeout(this._callTimeout),
+			headers: {
+				'Keep-Alive': `timeout=${Math.ceil(HTTP_KEEP_ALIVE / 1000)}`,
+			},
+			body: typeof bodyData !== 'string' ? JSON.stringify(bodyData) : bodyData,
+		})
 
-				throw error
-			} else if (error.response && error.response.body) {
-				return error.response.body
-			} else {
-				throw error
-			}
+		if (response.ok) {
+			return response.json() as Promise<T>
+		} else {
+			const responseBody = await response.text()
+			return Promise.reject(new Error(`Bad response from Quantel-Gateway: ${response.status} ${responseBody}`))
 		}
 	}
 
 	private urlQuery(url: string, params: QueryParameters = {}): string {
 		const paramStrs: string[] = []
-		for (const [key, value] of Object.entries(params)) {
+		for (const [key, value] of Object.entries<string | number | undefined>(params)) {
 			if (value !== undefined) {
 				paramStrs.push(`${key}=${encodeURIComponent(value.toString())}`)
 			}
