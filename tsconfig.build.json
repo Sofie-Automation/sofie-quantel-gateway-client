@@ -7,9 +7,9 @@
 		"outDir": "./dist",
 		"baseUrl": "./",
 		"paths": {
-			"*": ["./node_modules/*"],
 			"{{PACKAGE-NAME}}": ["./src/index.ts"]
 		},
-		"types": ["node"]
+		"types": ["node"],
+		"moduleResolution": "nodenext"
 	}
 }
