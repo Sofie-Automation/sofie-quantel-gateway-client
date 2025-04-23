@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [Convential Commits](https://www.conventionalcommits.org/en/v1.0.0/#specification) for commit guidelines.
 
+## [4.0.0](https://github.com/nrkno/tv-automation-quantel-gateway-client/compare/v3.1.11-agent-debug-20230117-160455-c2c4ee4.0...v4.0.0) (Wed Apr 23 2025)
+
+## Breaking changes
+
+### Features
+
+- **!** use node-fetch, use newer code-preset (#19) [8767916](https://github.com/nrkno/tv-automation-quantel-gateway-client/commit/87679162c6eaa79620110799185968aa503dc836)
+
 ## [3.1.7](https://github.com/nrkno/tv-automation-quantel-gateway-client/compare/v3.1.11-agent-debug-20230117-160455-c2c4ee4.0...v3.1.7) (Mon Jan 23 2023)
 
 ## [3.1.7-agent-debug-20230116-221517-1050c87.0](https://github.com/nrkno/tv-automation-quantel-gateway-client/compare/v3.1.6-agent-debug-20230116-213150-3920987.0...v3.1.7-agent-debug-20230116-221517-1050c87.0) (Mon Jan 16 2023)
