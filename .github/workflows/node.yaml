@@ -129,7 +129,7 @@ jobs:
         run: |
           echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" >> ~/.npmrc
           NEW_VERSION=$(node -p "require('./package.json').version")
-          yarn npm publish --access=public --network-timeout 100000 --tag ${{ steps.do-publish.outputs.tag }}
+          yarn npm publish --access=public --tag ${{ steps.do-publish.outputs.tag }}
         env:
           CI: true
 
