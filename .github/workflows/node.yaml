@@ -127,7 +127,7 @@ jobs:
       - name: Publish to NPM
         if: ${{ steps.do-publish.outputs.tag }}
         run: |
-          echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" >> ~/.npmrc
+          echo "npmAuthToken: \"${{ secrets.NPM_TOKEN }}\"" >> .yarnrc.yml
           NEW_VERSION=$(node -p "require('./package.json').version")
           yarn npm publish --access=public --tag ${{ steps.do-publish.outputs.tag }}
         env:
