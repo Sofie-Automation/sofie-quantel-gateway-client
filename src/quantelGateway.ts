@@ -35,7 +35,7 @@ const gatewayHTTPSAgent = new HTTPSAgent({
 const literal = <T>(t: T): T => t
 
 /**
- * Remote connection to a [Sofie Quantel Gateway](https://github.com/nrkno/sofie-quantel-gateway).
+ * Remote connection to a [Sofie Quantel Gateway](https://github.com/Sofie-Automation/sofie-quantel-gateway).
  * Create and initialize a new connection as follows:
  *
  *     const quantelClient = new QuantelGateway()

@@ -1,12 +1,13 @@
 # Sofie Quantel Gateway client
 
-This is the _Quantel Gateway Client_ library, a part of the [**Sofie** TV Automation System](https://github.com/nrkno/Sofie-TV-automation/). This client-side library is used for communication to the [Sofie Quantel Gateway](https://github.com/nrkno/sofie-quantel-gateway).
+This is the _Quantel Gateway Client_ library, a part of the [**Sofie** TV Automation System](https://github.com/Sofie-Automation/Sofie-TV-automation/). This client-side library is used for communication to the [Sofie Quantel Gateway](https://github.com/Sofie-Automation/sofie-quantel-gateway).
 
 ## General Sofie System Information
-* [_Sofie_ Documentation](https://nrkno.github.io/sofie-core/)
-* [_Sofie_ Releases](https://nrkno.github.io/sofie-core/releases)
-* [Contribution Guidelines](CONTRIBUTING.md)
-* [License](LICENSE)
+
+- [_Sofie_ Documentation](https://Sofie-Automation.github.io/sofie-core/)
+- [_Sofie_ Releases](https://Sofie-Automation.github.io/sofie-core/releases)
+- [Contribution Guidelines](CONTRIBUTING.md)
+- [License](LICENSE)
 
 ---
 
@@ -54,8 +55,7 @@ Once finished with the class, call `dispose()`.
 
 ### Documentation
 
-The library is self-documenting using TypeDoc annotations. Details of the REST API that this library is a client for can be found in the [Quantel Gateway documentation](https://github.com/nrkno/sofie-quantel-gateway#http-api).
-
+The library is self-documenting using TypeDoc annotations. Details of the REST API that this library is a client for can be found in the [Quantel Gateway documentation](https://github.com/Sofie-Automation/sofie-quantel-gateway#http-api).
 
 ---
 
